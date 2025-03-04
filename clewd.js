@@ -413,23 +413,8 @@ const updateParams = res => {
     const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
-    console.log(req.url);
-    if(req.url == "/hf/v1/models"){
-        console.log("加/hf后相等");
-    }
-    
-    // 尝试去除可能的空白字符后再比较
-    if (req.url.trim() === '/v1/models') {
-        console.log("trim 后相等");
-    }
-    
-    // 使用正则匹配
-    if (req.url.match(/^\/v1\/models$/)) {
-        console.log("正则匹配成功");
-    }
-    
-    switch (req.url) {
-      case '/v1/models':
+    switch (true) {
+      case /^\/v1\/models$/.test(req.url):
 /***************************** */
         (async (req, res) => {
             let models;
@@ -458,7 +443,7 @@ const updateParams = res => {
 /***************************** */
         break;
 
-      case '/v1/chat/completions':
+      case /^\/v1\/chat\/completions$/.test(req.url):
         ((req, res) => {
             setTitle('recv...');
             let fetchAPI;
@@ -877,7 +862,7 @@ const updateParams = res => {
         })(req, res);
         break;
 
-      case '/v1/complete':
+      case /^\/v1\/complete$/.test(req.url):
         res.json({
             error: {
                 message: 'clewd: Set "Chat Completion source" to OpenAI instead of Claude. Enable "External" models aswell',
