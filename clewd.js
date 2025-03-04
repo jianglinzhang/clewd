@@ -413,12 +413,22 @@ const updateParams = res => {
     const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
-    console.log(JSON.stringify(req.url))
-    if(req.url == '/v1/models'){
-        console.log("相等==")
+    // 添加详细的调试信息
+    console.log('URL详细信息：', {
+        url: req.url,
+        urlEncoded: encodeURIComponent(req.url),
+        urlLength: req.url.length,
+        charCodes: Array.from(req.url).map(c => c.charCodeAt(0))
+    });
+    
+    // 尝试去除可能的空白字符后再比较
+    if (req.url.trim() === '/v1/models') {
+        console.log("trim 后相等");
     }
-    if(req.url === '/v1/models'){
-        console.log("绝对相等===")
+    
+    // 使用正则匹配
+    if (req.url.match(/^\/v1\/models$/)) {
+        console.log("正则匹配成功");
     }
     switch (req.url) {
       case '/v1/models':
