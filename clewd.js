@@ -410,18 +410,20 @@ const updateParams = res => {
             }).end();
         })(0, res);
     }
-    const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
+    // const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
+    const URL = url.parse(req.url.replace(/\/api\/v1(\?.*)\$(\/.*)$/, '/api/v1$2$1'), true);
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
     console.log(req.url)
     switch (req.url) {
-      case '/v1/models':
+      case '/hf/v1/models':
 /***************************** */
         (async (req, res) => {
             let models;
             if (/oaiKey:/.test(req.headers.authorization)) {
                 try {
-                    const modelsRes = await fetch(api_rProxy.replace(/(\/v1)?\/? *$/, '') + '/v1/models', {
+                    // const modelsRes = await fetch(api_rProxy.replace(/(\/v1)?\/? *$/, '') + '/v1/models', {
+                    const modelsRes = await fetch(api_rProxy.replace(/(\/api\/v1)?\/? *$/, '') + '/api/v1/models', {
                         method: 'GET',
                         headers: { authorization: req.headers.authorization.match(/(?<=oaiKey:).*/)?.[0].split(',')[0].trim() }
                     });
@@ -444,7 +446,7 @@ const updateParams = res => {
 /***************************** */
         break;
 
-      case '/v1/chat/completions':
+      case '/hf/v1/chat/completions':
         ((req, res) => {
             setTitle('recv...');
             let fetchAPI;
@@ -722,7 +724,8 @@ const updateParams = res => {
                                 }, []).filter(message => message.content), oaiAPI ? messages.unshift({role: 'system', content: rounds[0].trim()}) : system = rounds[0].trim();
                                 messagesLog && console.log({system, messages});
                             }
-                            const res = await fetch((api_rProxy || 'https://api.anthropic.com').replace(/(\/v1)? *$/, thirdKey ? '$1' : '/v1').trim('/') + (oaiAPI ? '/chat/completions' : messagesAPI ? '/messages' : '/complete'), {
+                            // const res = await fetch((api_rProxy || 'https://api.anthropic.com').replace(/(\/v1)? *$/, thirdKey ? '$1' : '/v1').trim('/') + (oaiAPI ? '/chat/completions' : messagesAPI ? '/messages' : '/complete'), {
+                            const res = await fetch((api_rProxy || 'https://api.anthropic.com').replace(/(\/api\/v1)? *$/, thirdKey ? '$1' : '/api/v1').trim('/') + (oaiAPI ? '/chat/completions' : messagesAPI ? '/messages' : '/complete'), {
                                 method: 'POST',
                                 signal,
                                 headers: {
@@ -863,7 +866,7 @@ const updateParams = res => {
         })(req, res);
         break;
 
-      case '/v1/complete':
+      case '/hf/v1/complete':
         res.json({
             error: {
                 message: 'clewd: Set "Chat Completion source" to OpenAI instead of Claude. Enable "External" models aswell',
@@ -873,7 +876,8 @@ const updateParams = res => {
         break;
 
       default:
-        !['/', '/v1', '/favicon.ico'].includes(req.url) && (console.log('unknown request: ' + req.url)); //console.log('unknown request: ' + req.url);
+        // !['/', '/v1', '/favicon.ico'].includes(req.url) && (console.log('unknown request: ' + req.url)); //console.log('unknown request: ' + req.url);
+        !['/', '/api', '/api/v1', '/favicon.ico'].includes(req.url) && (console.log('unknown request: ' + req.url));
         res.writeHead(200, {'Content-Type': 'text/html'}); //
         res.write(`<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<script>\nfunction copyToClipboard(text) {\n  var textarea = document.createElement("textarea");\n  textarea.textContent = text;\n  textarea.style.position = "fixed";\n  document.body.appendChild(textarea);\n  textarea.select();\n  try {\n    return document.execCommand("copy");\n  } catch (ex) {\n    console.warn("Copy to clipboard failed.", ex);\n    return false;\n  } finally {\n    document.body.removeChild(textarea);\n  }\n}\nfunction copyLink(event) {\n  event.preventDefault();\n  const url = new URL(window.location.href);\n  const link = url.protocol + '//' + url.host + '/v1';\n  copyToClipboard(link);\n  alert('链接已复制: ' + link);\n}\n</script>\n</head>\n<body>\n${Main}<br/><br/>完全开源、免费且禁止商用<br/><br/>点击复制反向代理: <a href="v1" onclick="copyLink(event)">Copy Link</a><br/>填入OpenAI API反向代理并选择OpenAI分类中的claude模型（酒馆需打开Show "External" models，仅在api模式有模型选择差异）<br/><br/>教程与FAQ: <a href="https://rentry.org/teralomaniac_clewd" target="FAQ">Rentry</a> | <a href="https://discord.com/invite/B7Wr25Z7BZ" target="FAQ">Discord</a><br/><br/><br/>❗警惕任何高风险cookie/伪api(25k cookie)购买服务，以及破坏中文AI开源共享环境倒卖免费资源抹去署名的群组（🈲黑名单：酒馆小二、AI新服务、浅睡(鲑鱼)、赛博女友制作人(青麈/overloaded/科普晓百生)🈲）\n</body>\n</html>`); //
         res.end(); //res.json(//    {//    error: {//        message: '404 Not Found',//        type: 404,//        param: null,//        code: 404//    }//}, 404);
