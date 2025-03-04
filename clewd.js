@@ -414,6 +414,12 @@ const updateParams = res => {
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
     console.log(JSON.stringify(req.url))
+    if(req.url == '/v1/models'){
+        console.log("相等==")
+    }
+    if(req.url === '/v1/models'){
+        console.log("绝对相等===")
+    }
     switch (req.url) {
       case '/v1/models':
 /***************************** */
