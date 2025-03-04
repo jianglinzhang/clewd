@@ -413,6 +413,7 @@ const updateParams = res => {
     const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
+    console.log(JSON.stringify(req.url))
     switch (req.url) {
       case '/v1/models':
 /***************************** */
