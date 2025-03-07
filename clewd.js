@@ -721,6 +721,7 @@ const updateParams = res => {
                                 }, []).filter(message => message.content), oaiAPI ? messages.unshift({role: 'system', content: rounds[0].trim()}) : system = rounds[0].trim();
                                 messagesLog && console.log({system, messages});
                             }
+                            console.log(messages);
                             const res = await fetch((api_rProxy || 'https://api.anthropic.com').replace(/(\/v1)? *$/, thirdKey ? '$1' : '/v1').trim('/') + (oaiAPI ? '/chat/completions' : messagesAPI ? '/messages' : '/complete'), {
                                 method: 'POST',
                                 signal,
