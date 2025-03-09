@@ -816,16 +816,7 @@ const updateParams = res => {
                     }, Logger);
                     titleTimer = setInterval((() => setTitle('recv ' + bytesToSize(clewdStream.size))), 300);
                     (!apiKey && Config.Settings.Superfetch) ? await Readable.toWeb(fetchAPI.body).pipeThrough(clewdStream).pipeTo(response) : await fetchAPI.body.pipeThrough(clewdStream).pipeTo(response); //Config.Settings.Superfetch ? await Readable.toWeb(fetchAPI.body).pipeThrough(clewdStream).pipeTo(response) : await fetchAPI.body.pipeThrough(clewdStream).pipeTo(response);
-                    // Delete the conversation immediately after the response is sent.
-                    clewdStream.on('end', async () => {
-                    // This code will run *after* the entire stream has been sent.
-                    try {
-                        await deleteChat(Conversation.uuid);
-                        console.log('Conversation deleted after full stream.'); // For debugging
-                    } catch (err) {
-                        console.error('Error deleting conversation after stream:', err);
-                    }
-                });
+                    
                 } catch (err) {
                     if ('AbortError' === err.name) {
                         res.end();
@@ -856,11 +847,18 @@ const updateParams = res => {
                     console.log(`${200 == fetchAPI.status ? '[32m' : '[33m'}${fetchAPI.status}![0m\n`);
                     clewdStream.empty();
                 }
+                // Delete the conversation immediately after the response is sent.
+                try {
+                    await deleteChat(Conversation.uuid);
+                    console.log('Conversation deleted after full stream.'); // For debugging
+                } catch (err) {
+                    console.error('Error deleting conversation after stream:', err);
+                }
                 const shouldChange = exceeded_limit || !nochange && Config.Cookiecounter > 0 && changeflag++ >= Config.Cookiecounter - 1; //
                 if (!apiKey && (shouldChange || prevImpersonated)) { //if (prevImpersonated) {
-                    try {
-                        await deleteChat(Conversation.uuid);
-                    } catch (err) {}
+                    // try {
+                    //     await deleteChat(Conversation.uuid);
+                    // } catch (err) {}
 /******************************** */
                     if (shouldChange) {
                         exceeded_limit && console.log(`[35mExceeded limit![0m\n`);
@@ -871,6 +869,7 @@ const updateParams = res => {
                 }
             }));
         })(req, res);
+        
         break;
 
       case /^\/v1\/complete$/.test(req.url):
