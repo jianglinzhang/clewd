@@ -721,7 +721,8 @@ const updateParams = res => {
                                 }, []).filter(message => message.content), oaiAPI ? messages.unshift({role: 'system', content: rounds[0].trim()}) : system = rounds[0].trim();
                                 messagesLog && console.log({system, messages});
                             }
-                            console.log(messages);
+                            console.log({messages});
+                            Logger?.info({messages});
                             const res = await fetch((api_rProxy || 'https://api.anthropic.com').replace(/(\/v1)? *$/, thirdKey ? '$1' : '/v1').trim('/') + (oaiAPI ? '/chat/completions' : messagesAPI ? '/messages' : '/complete'), {
                                 method: 'POST',
                                 signal,
@@ -850,7 +851,7 @@ const updateParams = res => {
                 // Delete the conversation immediately after the response is sent.
                 try {
                     await deleteChat(Conversation.uuid);
-                    console.log('Conversation deleted after full stream.'); // For debugging
+                    // console.log('Conversation deleted after full stream.'); // For debugging
                 } catch (err) {
                     console.error('Error deleting conversation after stream:', err);
                 }
