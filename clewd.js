@@ -413,8 +413,8 @@ const updateParams = res => {
     const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
-    switch (req.url) {
-      case '/v1/models':
+    switch (true) {
+      case /^\/v1\/models$/.test(req.url):
 /***************************** */
         (async (req, res) => {
             let models;
@@ -443,7 +443,7 @@ const updateParams = res => {
 /***************************** */
         break;
 
-      case '/v1/chat/completions':
+      case /^\/v1\/chat\/completions$/.test(req.url):
         ((req, res) => {
             setTitle('recv...');
             let fetchAPI;
@@ -865,7 +865,7 @@ const updateParams = res => {
         })(req, res);
         break;
 
-      case '/v1/complete':
+      case /^\/v1\/complete$/.test(req.url):
         res.json({
             error: {
                 message: 'clewd: Set "Chat Completion source" to OpenAI instead of Claude. Enable "External" models aswell',
