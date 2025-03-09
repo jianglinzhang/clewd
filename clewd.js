@@ -848,18 +848,18 @@ const updateParams = res => {
                     console.log(`${200 == fetchAPI.status ? '[32m' : '[33m'}${fetchAPI.status}![0m\n`);
                     clewdStream.empty();
                 }
-                // // Delete the conversation immediately after the response is sent.
-                // try {
-                //     await deleteChat(Conversation.uuid);
-                //     console.log('Conversation deleted after full stream.'); // For debugging
-                // } catch (err) {
-                //     console.error('Error deleting conversation after stream:', err);
-                // }
+                // Delete the conversation immediately after the response is sent.
+                try {
+                    await deleteChat(Conversation.uuid);
+                    console.log('Conversation deleted after full stream.'); // For debugging
+                } catch (err) {
+                    console.error('Error deleting conversation after stream:', err);
+                }
                 const shouldChange = exceeded_limit || !nochange && Config.Cookiecounter > 0 && changeflag++ >= Config.Cookiecounter - 1; //
                 if (!apiKey && (shouldChange || prevImpersonated)) { //if (prevImpersonated) {
-                    try {
-                        await deleteChat(Conversation.uuid);
-                    } catch (err) {}
+                    // try {
+                    //     await deleteChat(Conversation.uuid);
+                    // } catch (err) {}
 /******************************** */
                     if (shouldChange) {
                         exceeded_limit && console.log(`[35mExceeded limit![0m\n`);
