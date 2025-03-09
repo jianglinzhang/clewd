@@ -816,6 +816,12 @@ const updateParams = res => {
                     }, Logger);
                     titleTimer = setInterval((() => setTitle('recv ' + bytesToSize(clewdStream.size))), 300);
                     (!apiKey && Config.Settings.Superfetch) ? await Readable.toWeb(fetchAPI.body).pipeThrough(clewdStream).pipeTo(response) : await fetchAPI.body.pipeThrough(clewdStream).pipeTo(response); //Config.Settings.Superfetch ? await Readable.toWeb(fetchAPI.body).pipeThrough(clewdStream).pipeTo(response) : await fetchAPI.body.pipeThrough(clewdStream).pipeTo(response);
+                    // Delete the conversation immediately after the response is sent.
+                    try {
+                        await deleteChat(Conversation.uuid);
+                    } catch (err) {
+                        console.error('Error deleting conversation after response:', err);
+                    }
                 } catch (err) {
                     if ('AbortError' === err.name) {
                         res.end();
