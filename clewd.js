@@ -413,8 +413,8 @@ const updateParams = res => {
     const URL = url.parse(req.url.replace(/\/v1(\?.*)\$(\/.*)$/, '/v1$2$1'), true);
     const api_rProxy = URL.query?.api_rProxy || Config.api_rProxy;
     req.url = URL.pathname;
-    switch (true) {
-      case /^\/v1\/models$/.test(req.url):
+    switch (req.url) {
+      case '/v1/models':
 /***************************** */
         (async (req, res) => {
             let models;
@@ -443,7 +443,7 @@ const updateParams = res => {
 /***************************** */
         break;
 
-      case /^\/v1\/chat\/completions$/.test(req.url):
+      case '/v1/chat/completions':
         ((req, res) => {
             setTitle('recv...');
             let fetchAPI;
@@ -665,26 +665,29 @@ const updateParams = res => {
                             systems = systemMessages.filter((message => !message.discard)).map((message => `"${message.content.substring(0, 25).replace(/\n/g, '\\n').trim()}..."`));
                             messagesClone.forEach((message => message.discard = message.discard || mergedLogs.includes(message) && ![ lastUser ].includes(message)));
                         }
-                        const prompt = messagesClone.map(((message, idx) => {
-                            if (message.merged || message.discard) {
-                                return '';
-                            }
-                            if (message.content.length < 1) {
-                                return message.content;
-                            }
-                            let spacing = '';
-/******************************** */
-                            if (Config.Settings.xmlPlot) {
-                                idx > 0 && (spacing = '\n\n');
-                                const prefix = message.customname ? message.role + ': ' + message.name.replaceAll('_', ' ') + ': ' : 'system' !== message.role || message.name ? Replacements[message.name || message.role] + ': ' : 'xmlPlot: ' + Replacements[message.role];
-                                return `${spacing}${message.strip ? '' : prefix}${message.content}`;
-                            } else {
-/******************************** */
-                                idx > 0 && (spacing = systemMessages.includes(message) ? '\n' : '\n\n');
-                                const prefix = message.customname ? message.name.replaceAll('_', ' ') + ': ' : 'system' !== message.role || message.name ? Replacements[message.name || message.role] + ': ' : '' + Replacements[message.role];
-                                return `${spacing}${message.strip ? '' : prefix}${'system' === message.role ? message.content : message.content.trim()}`;
-                            } //
-                        }));
+                        const prompt = messagesClone.map((message, idx) => {
+  if (message.merged || message.discard) {
+    return '';
+  }
+  // 检查 content 是否为数组，并提取文本
+    let content = Array.isArray(message.content) 
+    ? message.content.map(item => item?.text || '').join(' ') 
+    : message.content;
+  
+  if (content.length < 1) {
+    return content;
+  }
+  let spacing = '';
+  if (Config.Settings.xmlPlot) {
+    idx > 0 && (spacing = '\n\n');
+    const prefix = message.customname ? message.role + ': ' + message.name.replaceAll('_', ' ') + ': ' : 'system' !== message.role || message.name ? Replacements[message.name || message.role] + ': ' : 'xmlPlot: ' + Replacements[message.role];
+    return `${spacing}${message.strip ? '' : prefix}${content}`;
+  } else {
+    idx > 0 && (spacing = systemMessages.includes(message) ? '\n' : '\n\n');
+    const prefix = message.customname ? message.name.replaceAll('_', ' ') + ': ' : 'system' !== message.role || message.name ? Replacements[message.name || message.role] + ': ' : '' + Replacements[message.role];
+    return `${spacing}${message.strip ? '' : prefix}${'system' === message.role ? content : content.trim()}`;
+  }
+});
                         return {
                             prompt: prompt.join(''), //genericFixes(prompt.join('')).trim(),
                             systems
@@ -721,7 +724,6 @@ const updateParams = res => {
                                 }, []).filter(message => message.content), oaiAPI ? messages.unshift({role: 'system', content: rounds[0].trim()}) : system = rounds[0].trim();
                                 messagesLog && console.log({system, messages});
                             }
-                            console.log(messages);
                             const res = await fetch((api_rProxy || 'https://api.anthropic.com').replace(/(\/v1)? *$/, thirdKey ? '$1' : '/v1').trim('/') + (oaiAPI ? '/chat/completions' : messagesAPI ? '/messages' : '/complete'), {
                                 method: 'POST',
                                 signal,
@@ -863,7 +865,7 @@ const updateParams = res => {
         })(req, res);
         break;
 
-      case /^\/v1\/complete$/.test(req.url):
+      case '/v1/complete':
         res.json({
             error: {
                 message: 'clewd: Set "Chat Completion source" to OpenAI instead of Claude. Enable "External" models aswell',
