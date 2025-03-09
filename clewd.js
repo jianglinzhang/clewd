@@ -817,11 +817,15 @@ const updateParams = res => {
                     titleTimer = setInterval((() => setTitle('recv ' + bytesToSize(clewdStream.size))), 300);
                     (!apiKey && Config.Settings.Superfetch) ? await Readable.toWeb(fetchAPI.body).pipeThrough(clewdStream).pipeTo(response) : await fetchAPI.body.pipeThrough(clewdStream).pipeTo(response); //Config.Settings.Superfetch ? await Readable.toWeb(fetchAPI.body).pipeThrough(clewdStream).pipeTo(response) : await fetchAPI.body.pipeThrough(clewdStream).pipeTo(response);
                     // Delete the conversation immediately after the response is sent.
+                    clewdStream.on('end', async () => {
+                    // This code will run *after* the entire stream has been sent.
                     try {
                         await deleteChat(Conversation.uuid);
+                        console.log('Conversation deleted after full stream.'); // For debugging
                     } catch (err) {
-                        console.error('Error deleting conversation after response:', err);
+                        console.error('Error deleting conversation after stream:', err);
                     }
+                });
                 } catch (err) {
                     if ('AbortError' === err.name) {
                         res.end();
