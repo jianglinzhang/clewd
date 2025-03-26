@@ -382,7 +382,7 @@ const updateParams = res => {
         }
     }), conversations = await convRes.json();
     updateParams(convRes);
-    conversations.length > 0 && await asyncPool(10, conversations, async (conv) => await deleteChat(conv.uuid)); //await Promise.all(conversations.map((conv => deleteChat(conv.uuid))));
+    // conversations.length > 0 && await asyncPool(10, conversations, async (conv) => await deleteChat(conv.uuid)); //await Promise.all(conversations.map((conv => deleteChat(conv.uuid))));
 /***************************** */
     } catch (err) {
         if (err.message === 'Invalid authorization') {
