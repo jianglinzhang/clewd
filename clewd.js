@@ -576,7 +576,9 @@ const updateParams = res => {
                                 method: 'POST',
                                 body: JSON.stringify({
                                     uuid: Conversation.uuid,
-                                    name: ''
+                                    name: '',
+                                    model: model,
+                                    include_conversation_preferences: true
                                 })
                             });
                             updateParams(res);
