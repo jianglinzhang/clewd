@@ -578,7 +578,8 @@ const updateParams = res => {
                                     uuid: Conversation.uuid,
                                     name: '',
                                     model: model,
-                                    include_conversation_preferences: true
+                                    include_conversation_preferences: true,
+                                    paprika_mode = "extended"
                                 })
                             });
                             updateParams(res);
