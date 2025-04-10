@@ -579,7 +579,7 @@ const updateParams = res => {
                                     name: '',
                                     model: model,
                                     include_conversation_preferences: true,
-                                    paprika_mode = "extended"
+                                    paprika_mode: "extended"
                                 })
                             });
                             updateParams(res);
